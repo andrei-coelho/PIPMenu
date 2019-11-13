@@ -1,6 +1,19 @@
 <?php 
 /**
- * WP Nav Menu
+ * 
+ * PIPMenu
+ * @author Andrei Coelho
+ * @version 1.0.0
+ * 
+ * GIT HUB: https://github.com/andrei-coelho/PIPMenu
+ * License: MIT License - https://github.com/andrei-coelho/PIPMenu/blob/master/LICENSE
+ * 
+ * Esta pequena classe gera um menu nav bootstrap usando as 
+ * configurações do painel wp-admin
+ * 
+ * enjoy =)
+ * 
+ * 
  */
 
 
@@ -36,11 +49,25 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
         private $childs  = array();
 
         /**
+         * array auxiliar na construção dos pais
+         *
+         * @var array
+         */
+        private $fathers = array();
+
+        /**
          * array que contem os objetos WPNavItem
          *
          * @var array
          */
-        private $parents = array();
+        private $itens   = array();
+
+        /**
+         * tipo de menu (dropdown)
+         *
+         * @var string
+         */
+        private $type  = 'dropdown';
 
         /**
          * construtor
@@ -59,11 +86,11 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
                 if($itemMenu -> menu_item_parent > 0){
                     $this->childs[$itemMenu -> menu_item_parent][] =  new WPNavItem($itemMenu);
                 } else {
-                    $this->parents[] = new WPNavItem($itemMenu);
+                    $this->fathers[] = new WPNavItem($itemMenu);
                 }
             }
 
-            $this->generateMenu($this->parents, $this->childs);
+            $this->itens = $this->generateMenu($this->fathers, $this->childs);
 
         }
 
@@ -95,13 +122,18 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
 
         }
 
+        public function setType(string $type){
+            $this->type = $type;
+            return $this;
+        }
+
         /**
          * retorna um array de objetos WPNavItem
          * 
          * @return array 
          */
         public function getItens(){
-            return $this->parents;
+            return $this->itens;
         }
 
         /**
@@ -110,31 +142,87 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
          * 
          * @return void 
          */
-        public function genBootstrapMenu(){
+        public function genNav(){
             
-        }
+            foreach ($this->itens as $item) {
 
-        /**
-         * popula o array $parents com objetos WPNavItem
-         * 
-         * @return void 
-         */
-        private function generateMenu(array &$lista, array &$filhos){
+                $child = $item->hasChild();
+                $link = $child ? "#" : $item->url;
 
-            foreach ($lista as $pai) {
+                echo '<li class="nav-item '.$this->type.'">' .
+                     '<a class="nav-link dropdown-toggle" href="'.$link.'" id="navbarDropdown'.$item->ID.'" 
+                      role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        '.$item->title.'
+                      </a>';
 
-                if(isset($filhos[$pai->ID])){
-
-                    $meus = $filhos[$pai->ID];
-                    $this->generateMenu($meus, $filhos);
-                    $pai->setChildren($meus);
-                    unset($filhos[$pai->ID]);
-
+                if($child){
+                    $this->genChildsNav($item->getChilds());
                 }
+
+                echo '</li>';
 
             }
 
         }
+
+        /**
+         * Uma função auxiliar da genNav
+         * para gerar os submenus
+         * 
+         * @return void 
+         */
+        private function genChildsNav($childs){
+
+            echo '<div class="dropdown-menu" aria-labelledby="navbarDropdown">';
+
+            foreach ($childs as $child) {
+
+                if($child->hasChild()){
+
+                    echo '<div class="'.$this->type.'">
+                    <a href="#" class="dropdown-item dropdown-toggle" id="dropdownMenuButton'.$child->ID.'" pip-event="hover" data-toggle="dropdown">
+                        '.$child->title.'
+                    </a>';
+
+                    $this->genChildsNav($child->getChilds());
+                    echo '</div>';
+
+                } else {
+                    echo '<a class="dropdown-item" href="'.$child->url.'">'.$child->title.'</a>';
+                }
+
+            }
+            echo '</div>';
+        }
+
+        /**
+         * popula o array $itens com objetos WPNavItem
+         * 
+         * @return void 
+         */
+        private function generateMenu(array $pais){
+            
+            $listPais = array();
+
+            foreach ($pais as $pai) {
+               
+                if(isset($this->childs[$pai->ID])){
+                   
+                    $meusFilhos = $this->childs[$pai->ID];
+                    $meuFilhosENetos = $this->generateMenu($meusFilhos);
+                    $pai->setChildren($meuFilhosENetos);
+
+                }
+
+                $listPais[] = $pai;
+
+            }
+
+            return $listPais;
+
+        }
+
+
 
     }
 
@@ -148,8 +236,8 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
      */
     class WPNavItem {
         
-        public $ID, $title, $url;
-        private $child = array();
+        public  $ID, $title, $url;
+        private $childs = array();
 
         function __construct(WP_Post $post){
 
@@ -160,22 +248,22 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
         }
 
         public function hasChild(){
-            return count($this->child) > 0;
+            return count($this->childs) > 0;
         }
 
         public function setChildren(array $list){
-            $this->child = $list;
+            $this->childs = $list;
         }
 
         public function getChilds(){
-            return $this->child;
+            return $this->childs;
         }
 
         public function getChild(int $id){
-            return $this->child[$id];
+            return $this->childs[$id];
         }
 
     }
 
 
-}
+} // END IF
