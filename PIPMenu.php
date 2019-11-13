@@ -3,7 +3,7 @@
  * 
  * PIPMenu
  * @author Andrei Coelho
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * GIT HUB: https://github.com/andrei-coelho/PIPMenu
  * License: MIT License - https://github.com/andrei-coelho/PIPMenu/blob/master/LICENSE
@@ -70,14 +70,26 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
         private $type  = 'dropdown';
 
         /**
+         * url atual 
+         * 
+         * @var string
+         */
+        private static $url_current = null;
+
+        /**
          * construtor
          *
          * @param string $location
          */
         private function __construct(string $location){
 
-            if(self::$theme_locations == null){
+            if(self::$theme_locations === null){
                 self::$theme_locations = get_nav_menu_locations();
+            }
+
+            if(self::$url_current === null){
+                global $wp;
+                self::$url_current = home_url( $wp->request );
             }
 
             $menu_obj = get_term( self::$theme_locations[$location], 'nav_menu' );
@@ -148,9 +160,11 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
 
                 $child = $item->hasChild();
                 $link = $child ? "#" : $item->url;
+                $toggle = $child ? " dropdown-toggle" : '';
+                $active = $item->url === self::$url_current ? " active" : '';
 
                 echo '<li class="nav-item '.$this->type.'">' .
-                     '<a class="nav-link dropdown-toggle" href="'.$link.'" id="navbarDropdown'.$item->ID.'" 
+                     '<a class="nav-link'.$toggle.$active.'" href="'.$link.'" id="navbarDropdown'.$item->ID.'" 
                       role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         '.$item->title.'
                       </a>';
@@ -180,7 +194,7 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
                 if($child->hasChild()){
 
                     echo '<div class="'.$this->type.'">
-                    <a href="#" class="dropdown-item dropdown-toggle" id="dropdownMenuButton'.$child->ID.'" pip-event="hover" data-toggle="dropdown">
+                    <a href="#" class="dropdown-item dropdown-toggle" id="dropdownMenuButton'.$child->ID.'" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         '.$child->title.'
                     </a>';
 
