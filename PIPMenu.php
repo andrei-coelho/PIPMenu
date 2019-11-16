@@ -1,13 +1,27 @@
 <?php 
-/**
+/** ----------------------------------------------------------- *
+ *                                                     ____     *
+ *      __________      ____     __________           /   /|    *
+ *     /   ____   /|   /   /|   /   ____   /|   _____/   /_/__  *
+ *    /   /___/  / /  /   / /  /   /___/  / /  /____    _____/| *
+ *   /   _______/ /  /   / /  /   _______/ /   |___/   / ____|/ *
+ *  /   / ______|/  /   / /  /   / ______|/       /___/ /       *
+ * /___/ /         /___/ /  /___/ /               |___|/        *
+ * |___|/          |___|/   |___|/                              *
+ *                                                              *
+ * ------------------------------------------------------------ *
+ *                            PIPMenu                           *
+ *      Classe Geradora de Menu Booststrap para wordpress       *
+ * ------------------------------------------------------------ *
  * 
  * PIPMenu
- * @author Andrei Coelho
- * @version 1.0.1
+ * @author:  Andrei Coelho
+ * @version: 1.0.1
+ * @License: MIT License 
  * 
- * GIT HUB: https://github.com/andrei-coelho/PIPMenu
- * License: MIT License - https://github.com/andrei-coelho/PIPMenu/blob/master/LICENSE
- * 
+ * @description:
+ * Esta classe foi criada para a empresa pluginplus.com.br mas
+ * pode ser usado por qualquer um em qualquer algorítimo.
  * Esta pequena classe gera um menu nav bootstrap usando as 
  * configurações do painel wp-admin
  * 
@@ -146,6 +160,18 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
          */
         public function getItens(){
             return $this->itens;
+        }
+
+        /**
+         * Uma função auxiliar
+         * gera um menu em bootstrap com os padrões da pluginplus
+         * Este menu gerado só funcionará se em conjunto com o 
+         * arquivo pip_bootstrap.js
+         * 
+         * @return void 
+         */
+        public function genPipNav(){
+            // em criação
         }
 
         /**
