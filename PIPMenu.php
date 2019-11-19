@@ -187,7 +187,10 @@ if ( ! class_exists( 'PIPMenu' ) and ! class_exists( 'WPNavItem' ) ) {
                 $child = $item->hasChild();
                 $link = $child ? "#" : $item->url;
                 $toggle = $child ? " dropdown-toggle" : '';
-                $active = $item->url === self::$url_current ? " active" : '';
+                $active = 
+                $item->url === self::$url_current || 
+                $item->url === self::$url_current.'/'
+                ? " active" :  '';
 
                 echo '<li class="nav-item '.$this->type.'">' .
                      '<a class="nav-link'.$toggle.$active.'" href="'.$link.'" id="navbarDropdown'.$item->ID.'" 
